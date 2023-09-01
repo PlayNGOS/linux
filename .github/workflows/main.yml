@@ -17,7 +17,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Clone cross-compiler
+      - name: install dependencies
         run: sudo apt install git make gcc g++ device-tree-compiler bc bison flex libssl-dev libncurses-dev python3-ply python3-git libgmp3-dev libmpc-dev
       - name: Run build script
-        run: ./build_kernel.sh
+        run: |
+          export ARCH=arm64
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          make defconfig
+          make -j$(nproc --all)
