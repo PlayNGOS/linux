@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - "master"
+
+  pull_request:
+    branches:
+      - "master"
+
+name: Build
+
+jobs:
+  create-boot-image:
+    name: Create boot image for EDK2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Clone cross-compiler
+        run: sudo apt install git make gcc g++ device-tree-compiler bc bison flex libssl-dev libncurses-dev python3-ply python3-git libgmp3-dev libmpc-dev
+      - name: Run build script
+        run: ./build_kernel.sh
