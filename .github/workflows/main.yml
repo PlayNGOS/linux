@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: install dependencies
-        run: sudo apt install git make gcc g++ device-tree-compiler bc bison flex libssl-dev libncurses-dev python3-ply python3-git libgmp3-dev libmpc-dev
+        run: sudo apt install git make gcc g++ device-tree-compiler bc bison flex libssl-dev libncurses-dev python3-ply python3-git libgmp3-dev libmpc-dev gcc-aarch64-linux-gnu
       - name: Run build script
         run: |
           export ARCH=arm64
