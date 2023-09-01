@@ -25,3 +25,11 @@ jobs:
           export CROSS_COMPILE=aarch64-linux-gnu-
           make ginkgo_defconfig
           make -j$(nproc --all)
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Redmi Note 8
+          path: ./arch/arm64/boot/Image
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Redmi Note 8
+          path: ./arch/arm64/boot/dts/qcom/sm6125-xiaomi-ginkgo.dtb
