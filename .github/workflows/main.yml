@@ -24,7 +24,7 @@ jobs:
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
           make ginkgo_defconfig
-          make -j$(nproc --all)
+          make -j$(nproc --all) Image dtb
       - uses: actions/upload-artifact@v3
         with:
           name: Redmi Note 8
