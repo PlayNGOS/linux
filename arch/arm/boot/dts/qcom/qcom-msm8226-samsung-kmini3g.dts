@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ */
+
+#include "qcom-msm8226.dtsi"
+
+/ {
+	model = "Samsung Galaxy S5 Mini Duos";
+	compatible = "samsung,kmini3g", "qcom,msm8226";
+	chassis-type = "handset";
+};
