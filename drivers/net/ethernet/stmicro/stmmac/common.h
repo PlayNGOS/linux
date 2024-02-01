@@ -293,7 +293,7 @@ struct stmmac_safety_stats {
 #define MIN_DMA_RIWT		0x10
 #define DEF_DMA_RIWT		0xa0
 /* Tx coalesce parameters */
-#define STMMAC_COAL_TX_TIMER	1000
+#define STMMAC_COAL_TX_TIMER	5000
 #define STMMAC_MAX_COAL_TX_TICK	100000
 #define STMMAC_TX_MAX_FRAMES	256
 #define STMMAC_TX_FRAMES	25
@@ -563,6 +563,7 @@ struct mac_device_info {
 	const struct stmmac_hwtimestamp *ptp;
 	const struct stmmac_tc_ops *tc;
 	const struct stmmac_mmc_ops *mmc;
+	const struct stmmac_est_ops *est;
 	struct dw_xpcs *xpcs;
 	struct phylink_pcs *lynx_pcs; /* Lynx external PCS */
 	struct mii_regs mii;	/* MII register Addresses */
@@ -580,6 +581,7 @@ struct mac_device_info {
 	u32 vlan_filter[32];
 	bool vlan_fail_q_en;
 	u8 vlan_fail_q;
+	bool hw_vlan_en;
 };
 
 struct stmmac_rx_routing {

@@ -70,12 +70,6 @@
         "ScaleUnit": "100%"
     },
     {
-        "BriefDescription": "Uncore frequency per die [GHZ]",
-        "MetricExpr": "tma_info_system_socket_clks / #num_dies / duration_time / 1e9",
-        "MetricGroup": "SoC",
-        "MetricName": "UNCORE_FREQ"
-    },
-    {
         "BriefDescription": "Percentage of cycles spent in System Management Interrupts.",
         "MetricExpr": "((msr@aperf@ - cycles) / msr@aperf@ if msr@smi@ > 0 else 0)",
         "MetricGroup": "smi",
@@ -99,7 +93,7 @@
     },
     {
         "BriefDescription": "Number of cycles within a transaction divided by the number of elisions.",
-        "MetricExpr": "(cycles\\-t / el\\-start if has_event(cycles\\-t) else 0)",
+        "MetricExpr": "(cycles\\-t / el\\-start if has_event(el\\-start) else 0)",
         "MetricGroup": "transaction",
         "MetricName": "tsx_cycles_per_elision",
         "ScaleUnit": "1cycles / elision"
@@ -395,13 +389,13 @@
         "Unit": "cpu_atom"
     },
     {
-        "BriefDescription": "Instructions per Branch (lower number means higher occurance rate)",
+        "BriefDescription": "Instructions per Branch (lower number means higher occurrence rate)",
         "MetricExpr": "INST_RETIRED.ANY / BR_INST_RETIRED.ALL_BRANCHES",
         "MetricName": "tma_info_inst_mix_ipbranch",
         "Unit": "cpu_atom"
     },
     {
-        "BriefDescription": "Instruction per (near) call (lower number means higher occurance rate)",
+        "BriefDescription": "Instruction per (near) call (lower number means higher occurrence rate)",
         "MetricExpr": "INST_RETIRED.ANY / BR_INST_RETIRED.CALL",
         "MetricName": "tma_info_inst_mix_ipcall",
         "Unit": "cpu_atom"
@@ -726,7 +720,7 @@
         "Unit": "cpu_atom"
     },
     {
-        "BriefDescription": "Counts the numer of issue slots  that result in retirement slots.",
+        "BriefDescription": "Counts the number of issue slots  that result in retirement slots.",
         "DefaultMetricgroupName": "TopdownL1",
         "MetricExpr": "TOPDOWN_RETIRING.ALL / tma_info_core_slots",
         "MetricGroup": "Default;TopdownL1;tma_L1_group",
@@ -808,6 +802,13 @@
         "MetricThreshold": "tma_store_fwd_blk > 0.05",
         "ScaleUnit": "100%",
         "Unit": "cpu_atom"
+    },
+    {
+        "BriefDescription": "Uncore frequency per die [GHZ]",
+        "MetricExpr": "tma_info_system_socket_clks / #num_dies / duration_time / 1e9",
+        "MetricGroup": "SoC",
+        "MetricName": "UNCORE_FREQ",
+        "Unit": "cpu_core"
     },
     {
         "BriefDescription": "This metric represents Core fraction of cycles CPU dispatched uops on execution ports for ALU operations.",
@@ -1838,7 +1839,7 @@
     },
     {
         "BriefDescription": "Average number of parallel data read requests to external memory",
-        "MetricExpr": "UNC_ARB_DAT_OCCUPANCY.RD / cpu_core@UNC_ARB_DAT_OCCUPANCY.RD\\,cmask\\=1@",
+        "MetricExpr": "UNC_ARB_DAT_OCCUPANCY.RD / UNC_ARB_DAT_OCCUPANCY.RD@cmask\\=1@",
         "MetricGroup": "Mem;MemoryBW;SoC",
         "MetricName": "tma_info_system_mem_parallel_reads",
         "PublicDescription": "Average number of parallel data read requests to external memory. Accounts for demand loads and L1/L2 prefetches",

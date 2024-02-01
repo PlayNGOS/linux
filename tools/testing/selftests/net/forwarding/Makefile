@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0+ OR MIT
 
-TEST_PROGS = bridge_igmp.sh \
+TEST_PROGS = bridge_fdb_learning_limit.sh \
+	bridge_igmp.sh \
 	bridge_locked_port.sh \
 	bridge_mdb.sh \
 	bridge_mdb_host.sh \
@@ -16,6 +17,7 @@ TEST_PROGS = bridge_igmp.sh \
 	dual_vxlan_bridge.sh \
 	ethtool_extended_state.sh \
 	ethtool_mm.sh \
+	ethtool_rmon.sh \
 	ethtool.sh \
 	gre_custom_multipath_hash.sh \
 	gre_inner_v4_multipath.sh \

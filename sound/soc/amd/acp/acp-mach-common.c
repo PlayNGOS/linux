@@ -3,7 +3,7 @@
 // This file is provided under a dual BSD/GPLv2 license. When using or
 // redistributing this file, you may do so under either license.
 //
-// Copyright(c) 2021 Advanced Micro Devices, Inc.
+// Copyright(c) 2021, 2023 Advanced Micro Devices, Inc.
 //
 // Authors: Ajit Kumar Pandey <AjitKumar.Pandey@amd.com>
 //	    Vijendar Mukunda <Vijendar.Mukunda@amd.com>
@@ -117,7 +117,7 @@ static int acp_card_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	struct snd_soc_component *component = codec_dai->component;
 	int ret;
 
@@ -172,10 +172,10 @@ static int acp_card_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 static int acp_card_hs_startup(struct snd_pcm_substream *substream)
 {
 	struct snd_pcm_runtime *runtime = substream->runtime;
-	struct snd_soc_pcm_runtime *rtd = asoc_substream_to_rtd(substream);
+	struct snd_soc_pcm_runtime *rtd = snd_soc_substream_to_rtd(substream);
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	int ret;
 	unsigned int fmt;
 
@@ -206,7 +206,7 @@ static int acp_card_hs_startup(struct snd_pcm_substream *substream)
 
 static void acp_card_shutdown(struct snd_pcm_substream *substream)
 {
-	struct snd_soc_pcm_runtime *rtd = asoc_substream_to_rtd(substream);
+	struct snd_soc_pcm_runtime *rtd = snd_soc_substream_to_rtd(substream);
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
 
@@ -220,8 +220,8 @@ static int acp_card_rt5682_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
-	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *cpu_dai = snd_soc_rtd_to_cpu(rtd, 0);
 	int ret;
 	unsigned int fmt, srate, ch, format;
 
@@ -280,6 +280,22 @@ static int acp_card_rt5682_hw_params(struct snd_pcm_substream *substream,
 	if (ret < 0) {
 		dev_err(rtd->dev, "Failed to set codec SYSCLK: %d\n", ret);
 		return ret;
+	}
+
+	if (drvdata->tdm_mode) {
+		ret = snd_soc_dai_set_pll(codec_dai, RT5682S_PLL1, RT5682S_PLL_S_BCLK1,
+					  6144000, 49152000);
+		if (ret < 0) {
+			dev_err(rtd->dev, "Failed to set codec PLL: %d\n", ret);
+			return ret;
+		}
+
+		ret = snd_soc_dai_set_sysclk(codec_dai, RT5682S_SCLK_S_PLL1,
+					     49152000, SND_SOC_CLOCK_IN);
+		if (ret < 0) {
+			dev_err(rtd->dev, "Failed to set codec SYSCLK: %d\n", ret);
+			return ret;
+		}
 	}
 
 	/* Set tdm/i2s1 master bclk ratio */
@@ -342,7 +358,7 @@ static int acp_card_rt5682s_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	struct snd_soc_component *component = codec_dai->component;
 	int ret;
 
@@ -402,8 +418,8 @@ static int acp_card_rt5682s_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
-	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *cpu_dai = snd_soc_rtd_to_cpu(rtd, 0);
 	int ret;
 	unsigned int fmt, srate, ch, format;
 
@@ -462,6 +478,22 @@ static int acp_card_rt5682s_hw_params(struct snd_pcm_substream *substream,
 	if (ret < 0) {
 		dev_err(rtd->dev, "Failed to set codec SYSCLK: %d\n", ret);
 		return ret;
+	}
+
+	if (drvdata->tdm_mode) {
+		ret = snd_soc_dai_set_pll(codec_dai, RT5682S_PLL1, RT5682S_PLL_S_BCLK1,
+					  6144000, 49152000);
+		if (ret < 0) {
+			dev_err(rtd->dev, "Failed to set codec PLL: %d\n", ret);
+			return ret;
+		}
+
+		ret = snd_soc_dai_set_sysclk(codec_dai, RT5682S_SCLK_S_PLL1,
+					     49152000, SND_SOC_CLOCK_IN);
+		if (ret < 0) {
+			dev_err(rtd->dev, "Failed to set codec SYSCLK: %d\n", ret);
+			return ret;
+		}
 	}
 
 	/* Set tdm/i2s1 master bclk ratio */
@@ -573,7 +605,7 @@ static int acp_card_rt1019_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
 	struct snd_soc_dai *codec_dai;
-	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
+	struct snd_soc_dai *cpu_dai = snd_soc_rtd_to_cpu(rtd, 0);
 	int i, ret = 0;
 	unsigned int fmt, srate, ch, format;
 
@@ -737,7 +769,7 @@ static int acp_card_maxim_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
+	struct snd_soc_dai *cpu_dai = snd_soc_rtd_to_cpu(rtd, 0);
 	unsigned int fmt, srate, ch, format;
 	int ret;
 
@@ -928,7 +960,7 @@ static int acp_card_nau8825_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	struct snd_soc_component *component = codec_dai->component;
 	int ret;
 
@@ -980,11 +1012,11 @@ static int acp_card_nau8825_init(struct snd_soc_pcm_runtime *rtd)
 static int acp_nau8825_hw_params(struct snd_pcm_substream *substream,
 				 struct snd_pcm_hw_params *params)
 {
-	struct snd_soc_pcm_runtime *rtd = asoc_substream_to_rtd(substream);
+	struct snd_soc_pcm_runtime *rtd = snd_soc_substream_to_rtd(substream);
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
-	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *cpu_dai = snd_soc_rtd_to_cpu(rtd, 0);
 	int ret;
 	unsigned int fmt;
 
@@ -1142,7 +1174,7 @@ static struct snd_pcm_hw_constraint_list constraints_sample_bits = {
 static int acp_8821_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct snd_soc_card *card = rtd->card;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	struct snd_soc_component *component = codec_dai->component;
 	int ret;
 
@@ -1204,10 +1236,10 @@ static int acp_8821_startup(struct snd_pcm_substream *substream)
 static int acp_nau8821_hw_params(struct snd_pcm_substream *substream,
 				 struct snd_pcm_hw_params *params)
 {
-	struct snd_soc_pcm_runtime *rtd = asoc_substream_to_rtd(substream);
+	struct snd_soc_pcm_runtime *rtd = snd_soc_substream_to_rtd(substream);
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
+	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	int ret;
 	unsigned int fmt;
 
@@ -1260,6 +1292,18 @@ static struct snd_soc_dai_link_component platform_rmb_component[] = {
 	}
 };
 
+static struct snd_soc_dai_link_component platform_acp63_component[] = {
+	{
+		.name = "acp_asoc_acp63.0",
+	}
+};
+
+static struct snd_soc_dai_link_component platform_acp70_component[] = {
+	{
+		.name = "acp_asoc_acp70.0",
+	}
+};
+
 static struct snd_soc_dai_link_component sof_component[] = {
 	{
 		 .name = "0000:04:00.5",
@@ -1278,6 +1322,8 @@ SND_SOC_DAILINK_DEF(sof_hs,
 		    DAILINK_COMP_ARRAY(COMP_CPU("acp-sof-hs")));
 SND_SOC_DAILINK_DEF(sof_hs_virtual,
 	DAILINK_COMP_ARRAY(COMP_CPU("acp-sof-hs-virtual")));
+SND_SOC_DAILINK_DEF(sof_bt,
+		    DAILINK_COMP_ARRAY(COMP_CPU("acp-sof-bt")));
 SND_SOC_DAILINK_DEF(sof_dmic,
 	DAILINK_COMP_ARRAY(COMP_CPU("acp-sof-dmic")));
 SND_SOC_DAILINK_DEF(pdm_dmic,
@@ -1336,6 +1382,8 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 
 	if (drv_data->hs_cpu_id)
 		num_links++;
+	if (drv_data->bt_cpu_id)
+		num_links++;
 	if (drv_data->amp_cpu_id)
 		num_links++;
 	if (drv_data->dmic_cpu_id)
@@ -1358,7 +1406,7 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 		links[i].no_pcm = 1;
 		if (!drv_data->hs_codec_id) {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		if (drv_data->hs_codec_id == RT5682) {
@@ -1395,7 +1443,7 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 		links[i].no_pcm = 1;
 		if (!drv_data->hs_codec_id) {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		if (drv_data->hs_codec_id == NAU8825) {
@@ -1425,7 +1473,7 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 		links[i].no_pcm = 1;
 		if (!drv_data->amp_codec_id) {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		if (drv_data->amp_codec_id == RT1019) {
@@ -1457,7 +1505,7 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 		links[i].no_pcm = 1;
 		if (!drv_data->amp_codec_id) {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		if (drv_data->amp_codec_id == MAX98360A) {
@@ -1467,6 +1515,7 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 			links[i].init = acp_card_maxim_init;
 		}
 		if (drv_data->amp_codec_id == MAX98388) {
+			links[i].dpcm_capture = 1;
 			links[i].codecs = max98388;
 			links[i].num_codecs = ARRAY_SIZE(max98388);
 			links[i].ops = &acp_max98388_ops;
@@ -1481,6 +1530,25 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 			links[i].init = acp_card_rt1019_init;
 			card->codec_conf = rt1019_conf;
 			card->num_configs = ARRAY_SIZE(rt1019_conf);
+		}
+		i++;
+	}
+
+	if (drv_data->bt_cpu_id == I2S_BT) {
+		links[i].name = "acp-bt-codec";
+		links[i].id = BT_BE_ID;
+		links[i].cpus = sof_bt;
+		links[i].num_cpus = ARRAY_SIZE(sof_bt);
+		links[i].platforms = sof_component;
+		links[i].num_platforms = ARRAY_SIZE(sof_component);
+		links[i].dpcm_playback = 1;
+		links[i].dpcm_capture = 1;
+		links[i].nonatomic = true;
+		links[i].no_pcm = 1;
+		if (!drv_data->bt_codec_id) {
+			/* Use dummy codec if codec id not specified */
+			links[i].codecs = &snd_soc_dummy_dlc;
+			links[i].num_codecs = 1;
 		}
 		i++;
 	}
@@ -1513,6 +1581,7 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 	struct device *dev = card->dev;
 	struct acp_card_drvdata *drv_data = card->drvdata;
 	int i = 0, num_links = 0;
+	int rc;
 
 	if (drv_data->hs_cpu_id)
 		num_links++;
@@ -1536,7 +1605,7 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		links[i].dpcm_capture = 1;
 		if (!drv_data->hs_codec_id) {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		if (drv_data->hs_codec_id == RT5682) {
@@ -1551,6 +1620,13 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 			links[i].init = acp_card_rt5682s_init;
 			links[i].ops = &acp_card_rt5682s_ops;
 		}
+		if (drv_data->hs_codec_id == ES83XX) {
+			rc = acp_ops_configure_link(card, &links[i]);
+			if (rc != 0) {
+				dev_err(dev, "Failed to configure link for ES83XX: %d\n", rc);
+				return rc;
+			}
+		}
 		i++;
 	}
 
@@ -1562,6 +1638,9 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		if (drv_data->platform == REMBRANDT) {
 			links[i].platforms = platform_rmb_component;
 			links[i].num_platforms = ARRAY_SIZE(platform_rmb_component);
+		} else if (drv_data->platform == ACP63) {
+			links[i].platforms = platform_acp63_component;
+			links[i].num_platforms = ARRAY_SIZE(platform_acp63_component);
 		} else {
 			links[i].platforms = platform_component;
 			links[i].num_platforms = ARRAY_SIZE(platform_component);
@@ -1570,7 +1649,7 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		links[i].dpcm_capture = 1;
 		if (!drv_data->hs_codec_id) {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		if (drv_data->hs_codec_id == NAU8825) {
@@ -1598,7 +1677,7 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		links[i].dpcm_playback = 1;
 		if (!drv_data->amp_codec_id) {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		if (drv_data->amp_codec_id == RT1019) {
@@ -1626,6 +1705,9 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		if (drv_data->platform == REMBRANDT) {
 			links[i].platforms = platform_rmb_component;
 			links[i].num_platforms = ARRAY_SIZE(platform_rmb_component);
+		} else if (drv_data->platform == ACP63) {
+			links[i].platforms = platform_acp63_component;
+			links[i].num_platforms = ARRAY_SIZE(platform_acp63_component);
 		} else {
 			links[i].platforms = platform_component;
 			links[i].num_platforms = ARRAY_SIZE(platform_component);
@@ -1633,7 +1715,7 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		links[i].dpcm_playback = 1;
 		if (!drv_data->amp_codec_id) {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		if (drv_data->amp_codec_id == MAX98360A) {
@@ -1661,7 +1743,7 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 			links[i].num_codecs = ARRAY_SIZE(dmic_codec);
 		} else {
 			/* Use dummy codec if codec id not specified */
-			links[i].codecs = &asoc_dummy_dlc;
+			links[i].codecs = &snd_soc_dummy_dlc;
 			links[i].num_codecs = 1;
 		}
 		links[i].cpus = pdm_dmic;
@@ -1669,6 +1751,12 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		if (drv_data->platform == REMBRANDT) {
 			links[i].platforms = platform_rmb_component;
 			links[i].num_platforms = ARRAY_SIZE(platform_rmb_component);
+		} else if (drv_data->platform == ACP63) {
+			links[i].platforms = platform_acp63_component;
+			links[i].num_platforms = ARRAY_SIZE(platform_acp63_component);
+		} else if (drv_data->platform == ACP70) {
+			links[i].platforms = platform_acp70_component;
+			links[i].num_platforms = ARRAY_SIZE(platform_acp70_component);
 		} else {
 			links[i].platforms = platform_component;
 			links[i].num_platforms = ARRAY_SIZE(platform_component);
@@ -1685,4 +1773,5 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 }
 EXPORT_SYMBOL_NS_GPL(acp_legacy_dai_links_create, SND_SOC_AMD_MACH);
 
+MODULE_DESCRIPTION("AMD ACP Common Machine driver");
 MODULE_LICENSE("GPL v2");

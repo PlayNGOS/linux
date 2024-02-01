@@ -259,7 +259,7 @@
 	((val) << XGMAC_PPS_MINIDX(x))
 #define XGMAC_PPSCMD_START		0x2
 #define XGMAC_PPSCMD_STOP		0x5
-#define XGMAC_PPSEN0			BIT(4)
+#define XGMAC_PPSENx(x)			BIT(4 + (x) * 8)
 #define XGMAC_PPSx_TARGET_TIME_SEC(x)	(0x00000d80 + (x) * 0x10)
 #define XGMAC_PPSx_TARGET_TIME_NSEC(x)	(0x00000d84 + (x) * 0x10)
 #define XGMAC_TRGTBUSY0			BIT(31)
@@ -284,22 +284,6 @@
 #define XGMAC_TC_PRTY_MAP1		0x00001044
 #define XGMAC_PSTC(x)			GENMASK((x) * 8 + 7, (x) * 8)
 #define XGMAC_PSTC_SHIFT(x)		((x) * 8)
-#define XGMAC_MTL_EST_CONTROL		0x00001050
-#define XGMAC_PTOV			GENMASK(31, 23)
-#define XGMAC_PTOV_SHIFT		23
-#define XGMAC_SSWL			BIT(1)
-#define XGMAC_EEST			BIT(0)
-#define XGMAC_MTL_EST_GCL_CONTROL	0x00001080
-#define XGMAC_BTR_LOW			0x0
-#define XGMAC_BTR_HIGH			0x1
-#define XGMAC_CTR_LOW			0x2
-#define XGMAC_CTR_HIGH			0x3
-#define XGMAC_TER			0x4
-#define XGMAC_LLR			0x5
-#define XGMAC_ADDR_SHIFT		8
-#define XGMAC_GCRR			BIT(2)
-#define XGMAC_SRWO			BIT(0)
-#define XGMAC_MTL_EST_GCL_DATA		0x00001084
 #define XGMAC_MTL_RXP_CONTROL_STATUS	0x000010a0
 #define XGMAC_RXPI			BIT(31)
 #define XGMAC_NPE			GENMASK(23, 16)
