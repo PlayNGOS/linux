@@ -1,0 +1,31 @@
+on:
+  push:
+    branches:
+      - "master"
+
+  pull_request:
+    branches:
+      - "master"
+
+name: Build
+
+jobs:
+  create-boot-image:
+    name: Create boot image for starqltechn
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: install dependencies
+        run: sudo apt install git make gcc g++ device-tree-compiler bc bison flex libssl-dev libncurses-dev python3-ply python3-git libgmp3-dev libmpc-dev gcc-aarch64-linux-gnu
+      - name: Run build script
+        run: |
+          export ARCH=arm64
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          make ginkgo_defconfig
+          make -j$(nproc --all) dtbs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Redmi Note 8
+          path: ./arch/arm64/boot/dts/qcom/sdm845-samsung-starqltechn.dtb
