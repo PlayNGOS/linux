@@ -322,13 +322,17 @@ struct dpp_funcs {
 			const struct pwl_params *params);
 	bool (*dpp_program_3dlut)(
 			struct dpp *dpp,
-			struct tetrahedral_params *params);
+			const struct tetrahedral_params *params);
 	void (*dpp_cnv_set_alpha_keyer)(
 			struct dpp *dpp_base,
 			struct cnv_color_keyer_params *color_keyer);
 
 	void (*dpp_get_gamut_remap)(struct dpp *dpp_base,
 				    struct dpp_grph_csc_adjustment *adjust);
+	void (*set_cursor_matrix)(
+		struct dpp *dpp_base,
+		enum dc_color_space color_space,
+		struct dc_csc_transform cursor_csc_color_matrix);
 };
 
 

@@ -768,8 +768,10 @@ static int nh_grp_hw_stats_update(struct nexthop *nh, bool *hw_stats_used)
 	struct net *net = nh->net;
 	int err;
 
-	if (nexthop_notifiers_is_empty(net))
+	if (nexthop_notifiers_is_empty(net)) {
+		*hw_stats_used = false;
 		return 0;
+	}
 
 	err = nh_notifier_grp_hw_stats_init(&info, nh);
 	if (err)
@@ -886,9 +888,10 @@ static int nla_put_nh_group(struct sk_buff *skb, struct nexthop *nh,
 
 	p = nla_data(nla);
 	for (i = 0; i < nhg->num_nh; ++i) {
-		p->id = nhg->nh_entries[i].nh->id;
-		p->weight = nhg->nh_entries[i].weight - 1;
-		p += 1;
+		*p++ = (struct nexthop_grp) {
+			.id = nhg->nh_entries[i].nh->id,
+			.weight = nhg->nh_entries[i].weight - 1,
+		};
 	}
 
 	if (nhg->resilient && nla_put_nh_group_res(skb, nhg))
